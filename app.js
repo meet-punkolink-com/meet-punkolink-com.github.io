@@ -563,8 +563,8 @@ el.btnChatToggle.addEventListener('click', () => el.chat.classList.toggle('open'
 el.inviteAccept.addEventListener('click', acceptInvite);
 el.inviteDecline.addEventListener('click', closeInvite);
 
-// Prefill server with current origin (when the client is served by the server).
-if (location.protocol === 'http:' || location.protocol === 'https:') el.inServer.value = location.origin;
+// Prefill server with the default punkolink gateway.
+el.inServer.value = 'https://gateway.europe-central2-a.core.punkolink.com';
 
 // Clock.
 updateClock();
