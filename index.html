@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="color-scheme" content="dark" />
+  <title>workspace</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='none' stroke='%233ddc97' stroke-width='8'/></svg>" />
+</head>
+<body>
+
+  <div class="bg-grid" aria-hidden="true"></div>
+
+  <!-- ===================== SIGN-IN (OS login) ===================== -->
+  <section id="screen-login" class="screen screen--center">
+    <div class="card login-card">
+      <header class="brand">
+        <span class="brand__dot"></span>
+        <span class="brand__name">workspace</span>
+        <span class="brand__sub">shared remote space</span>
+      </header>
+
+      <form id="login-form" class="form" autocomplete="off">
+        <label class="field">
+          <span class="field__label">your username</span>
+          <input id="in-username" class="input" type="text" placeholder="e.g. neo" maxlength="32" required />
+        </label>
+
+        <label class="field">
+          <span class="field__label">signaling server</span>
+          <input id="in-server" class="input" type="text" placeholder="https://signal.example.com" required />
+          <span class="field__hint">the same server your teammates use</span>
+        </label>
+
+        <button id="btn-connect" class="btn btn--primary" type="submit">sign in</button>
+        <p id="login-status" class="status" role="status"></p>
+      </form>
+
+      <footer class="login-foot">
+        no history · no accounts · forgotten on reload
+      </footer>
+    </div>
+  </section>
+
+  <!-- ===================== DESKTOP ===================== -->
+  <div id="desktop" class="desktop hidden">
+
+    <!-- Left dock (Ubuntu-style launcher) -->
+    <aside class="dock">
+      <div class="dock__brand"><span class="dock__logo"></span></div>
+
+      <nav class="dock__apps">
+        <button class="dock-app is-active" data-service="calls" type="button" aria-label="Calls">
+          <span class="dock-app__icon" data-icon="calls"></span>
+          <span class="dock-app__run"></span>
+          <span class="dock-app__badge"></span>
+          <span class="dock-app__tip">Calls</span>
+        </button>
+        <button class="dock-app" data-service="empty" type="button" aria-label="Empty window">
+          <span class="dock-app__icon" data-icon="window"></span>
+          <span class="dock-app__run"></span>
+          <span class="dock-app__tip">Empty window</span>
+        </button>
+      </nav>
+
+      <div class="dock__bottom">
+        <div class="dock-user" id="dock-user" title=""><span id="dock-initials"></span></div>
+        <button class="dock-app dock-power" id="btn-logout" type="button" aria-label="Sign out">
+          <span class="dock-app__icon" data-icon="power"></span>
+          <span class="dock-app__tip">Sign out</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Workspace -->
+    <main class="workspace">
+      <div class="topbar">
+        <span class="topbar__title" id="active-title">Calls</span>
+        <span class="topbar__right">
+          <span id="topbar-user" class="topbar__user"></span>
+          <span class="topbar__clock" id="clock"></span>
+        </span>
+      </div>
+
+      <div class="service-stack">
+
+        <!-- ============ SERVICE: CALLS ============ -->
+        <section class="service is-active" data-service="calls">
+
+          <!-- lobby -->
+          <div class="calls-view" data-view="lobby">
+            <div class="card lobby-card">
+              <h1 class="lobby-title">Calls</h1>
+              <p class="lobby-tagline">Talk by room name, or call someone by username.</p>
+
+              <div class="lobby-actions">
+                <div class="action">
+                  <h2 class="action__title">Join a room</h2>
+                  <p class="action__desc">Everyone who enters the same room name on the same server lands in a shared call.</p>
+                  <form id="room-form" class="row" autocomplete="off">
+                    <input id="in-room" class="input" type="text" placeholder="room name" maxlength="64" required />
+                    <button class="btn btn--primary" type="submit">Join</button>
+                  </form>
+                </div>
+
+                <div class="action__sep"><span>or</span></div>
+
+                <div class="action">
+                  <h2 class="action__title">Call by username</h2>
+                  <p class="action__desc">Enter one or more usernames — they'll get an invite.</p>
+                  <form id="call-form" class="row" autocomplete="off">
+                    <input id="in-call" class="input" type="text" placeholder="alice, bob" maxlength="200" required />
+                    <button class="btn btn--primary" type="submit">Call</button>
+                  </form>
+                </div>
+              </div>
+
+              <p id="lobby-status" class="status" role="status"></p>
+            </div>
+          </div>
+
+          <!-- room (active call) -->
+          <div class="calls-view hidden" data-view="room">
+            <header class="room-head">
+              <div class="room-head__left">
+                <span class="room-tag">#</span>
+                <span id="room-name" class="room-name"></span>
+                <span id="room-count" class="room-count"></span>
+              </div>
+              <button id="btn-chat-toggle" class="btn btn--ghost btn--sm room-head__chat" type="button">Chat</button>
+            </header>
+
+            <div class="room-body">
+              <div id="grid" class="grid"></div>
+
+              <aside id="chat" class="chat">
+                <div id="chat-log" class="chat__log" aria-live="polite"></div>
+                <form id="chat-form" class="chat__form" autocomplete="off">
+                  <input id="chat-input" class="input" type="text" placeholder="Message…" maxlength="2000" />
+                  <button class="btn btn--primary btn--send" type="submit" aria-label="send">↵</button>
+                </form>
+              </aside>
+            </div>
+
+            <footer class="controls">
+              <button id="btn-mic" class="ctl" type="button" aria-pressed="false" title="Microphone">
+                <span class="ctl__icon" data-icon="mic"></span>
+                <span class="ctl__label">Microphone</span>
+              </button>
+              <button id="btn-cam" class="ctl" type="button" aria-pressed="false" title="Camera">
+                <span class="ctl__icon" data-icon="cam"></span>
+                <span class="ctl__label">Camera</span>
+              </button>
+              <button id="btn-leave" class="ctl ctl--danger" type="button" title="Leave">
+                <span class="ctl__icon" data-icon="leave"></span>
+                <span class="ctl__label">Leave</span>
+              </button>
+            </footer>
+          </div>
+
+        </section>
+
+        <!-- ============ SERVICE: EMPTY WINDOW (stub) ============ -->
+        <section class="service" data-service="empty">
+          <div class="empty-stage">
+            <div class="empty-win">
+              <div class="empty-win__chrome">
+                <span class="empty-win__dots"><i></i><i></i><i></i></span>
+                <span class="empty-win__title">Empty window</span>
+              </div>
+              <div class="empty-win__body">
+                <div class="empty-win__glyph" data-icon="window"></div>
+                <p class="empty-win__h">Placeholder service</p>
+                <p class="empty-win__p">A blank app slot. Future workspace tools will live here — docs, boards, whatever the team needs. Calls keep running in the background while you're here.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ===================== INCOMING CALL (global, on top) ===================== -->
+  <div id="invite-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal__box card">
+      <div class="modal__icon"></div>
+      <p class="modal__text"><b id="invite-from"></b> is calling you<span id="invite-with"></span></p>
+      <div class="modal__actions">
+        <button id="invite-decline" class="btn btn--ghost" type="button">Decline</button>
+        <button id="invite-accept" class="btn btn--primary" type="button">Join</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
